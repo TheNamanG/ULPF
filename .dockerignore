@@ -1,0 +1,14 @@
+.venv/
+.git/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+tests/
+scratch_test.py
+live_stream.py
+load_test.py
+windows_logs_5000.json
+*.pptx
+data/

@@ -1,0 +1,60 @@
+# =============================================================================
+# ULPF Parser: Cisco ASA Firewall
+# =============================================================================
+# Matches Cisco ASA syslog messages for connection build/teardown and deny.
+# Maps to OCSF Network Activity (class_uid=4001, category_uid=4).
+# =============================================================================
+
+name: cisco_asa
+version: "1.0.0"
+author: human
+created_at: "2026-09-06T00:00:00Z"
+description: >
+  Parses Cisco ASA firewall syslog messages including connection built
+  (ASA-6-302013), connection teardown (ASA-6-302014), and access denied
+  (ASA-4-106023). Maps to OCSF Network Activity events.
+
+vendor: cisco
+log_format: syslog
+match_priority: 100
+
+ocsf_class: network_activity
+ocsf_category_uid: 4
+ocsf_class_uid: 4001
+
+match_patterns:
+  # %ASA-6-302013: Built inbound TCP connection 12345 for outside:10.0.0.1/1234 (10.0.0.1/1234) to inside:192.168.1.1/443 (192.168.1.1/443)
+  - '%ASA-(?P<severity>\d)-(?P<message_id>302013):\s+Built\s+(?P<direction>\S+)\s+(?P<protocol>\S+)\s+connection\s+(?P<conn_id>\d+)\s+for\s+\S+:(?P<src_ip>[^/]+)/(?P<src_port>\d+)\s+\([^)]*\)\s+to\s+\S+:(?P<dst_ip>[^/]+)/(?P<dst_port>\d+)'
+  # %ASA-6-302014: Teardown TCP connection 12345 for outside:10.0.0.1/1234 to inside:192.168.1.1/443 duration 0:01:30 bytes 4567
+  - '%ASA-(?P<severity>\d)-(?P<message_id>302014):\s+Teardown\s+(?P<protocol>\S+)\s+connection\s+(?P<conn_id>\d+)\s+for\s+\S+:(?P<src_ip>[^/]+)/(?P<src_port>\d+)\s+to\s+\S+:(?P<dst_ip>[^/]+)/(?P<dst_port>\d+)\s+duration\s+(?P<duration>\S+)\s+bytes\s+(?P<bytes>\d+)'
+  # %ASA-4-106023: Deny tcp src outside:10.0.0.1/1234 dst inside:192.168.1.1/443 by access-group "outside_in"
+  - '%ASA-(?P<severity>\d)-(?P<message_id>106023):\s+Deny\s+(?P<protocol>\S+)\s+src\s+\S+:(?P<src_ip>[^/]+)/(?P<src_port>\d+)\s+dst\s+\S+:(?P<dst_ip>[^/]+)/(?P<dst_port>\d+)'
+
+field_mappings:
+  - ocsf_field: src_endpoint.ip
+    type: str
+    jinja2_template: "{{ src_ip }}"
+
+  - ocsf_field: src_endpoint.port
+    type: int
+    jinja2_template: "{{ src_port }}"
+
+  - ocsf_field: dst_endpoint.ip
+    type: str
+    jinja2_template: "{{ dst_ip }}"
+
+  - ocsf_field: dst_endpoint.port
+    type: int
+    jinja2_template: "{{ dst_port }}"
+
+  - ocsf_field: connection_info.protocol_name
+    type: str
+    jinja2_template: "{{ protocol | upper }}"
+
+  - ocsf_field: traffic.bytes
+    type: int
+    jinja2_template: "{{ bytes | default('0') }}"
+    default: 0
+
+static_values:
+  severity_id: 1  # Informational (overridden per-message by engine)

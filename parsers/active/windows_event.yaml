@@ -1,0 +1,19 @@
+name: windows_event
+version: 1.0.0
+author: human
+created_at: "2026-09-06T00:00:00Z"
+vendor: microsoft
+log_format: json
+match_priority: 50
+match_patterns:
+  # A regex to catch JSON strings containing MachineName and EventID (including multiline and variable key ordering)
+  - '(?s)(?P<msg>\{.*?"EventID"\s*:.*?"MachineName"\s*:.*?\})'
+  - '(?s)(?P<msg>\{.*?"MachineName"\s*:.*?"EventID"\s*:.*?\})'
+  - '(?s)(?P<msg>\{.*?"MachineName"\s*:.*?\})'
+ocsf_class: base_event
+ocsf_category_uid: 0
+ocsf_class_uid: 0
+field_mappings:
+  - ocsf_field: message
+    type: str
+    jinja2_template: "{{ msg }}"

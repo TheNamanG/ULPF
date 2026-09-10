@@ -1,0 +1,5 @@
+<134>1 2026-09-06T10:00:00.000Z myhost myapp 1234 ID47 [exampleSDID@32473 iut="3"] Application event occurred
+<165>1 2026-09-06T10:00:01.000Z router1 snmpd 5678 MSG001 - SNMP trap received from 10.0.0.1
+<86>1 2026-09-06T10:00:02.000Z firewall kernel - - - Firewall rule triggered for 192.168.1.1
+<13>Sep  6 10:00:03 legacyhost syslogd: restart
+<134>1 2026-09-06T10:00:04.000Z webserver nginx 9999 REQ123 [meta seq="1"] GET /api/health 200

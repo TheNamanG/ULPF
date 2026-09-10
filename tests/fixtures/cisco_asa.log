@@ -1,0 +1,5 @@
+%ASA-6-302013: Built inbound TCP connection 12345 for outside:10.0.0.1/1234 (10.0.0.1/1234) to inside:192.168.1.1/443 (192.168.1.1/443)
+%ASA-6-302014: Teardown TCP connection 12345 for outside:10.0.0.1/1234 to inside:192.168.1.1/443 duration 0:01:30 bytes 4567
+%ASA-4-106023: Deny tcp src outside:10.0.0.5/8080 dst inside:192.168.1.100/22
+%ASA-6-302013: Built outbound TCP connection 67890 for inside:192.168.1.50/55555 (192.168.1.50/55555) to outside:8.8.8.8/53 (8.8.8.8/53)
+%ASA-6-302014: Teardown UDP connection 99999 for outside:203.0.113.5/12345 to inside:10.0.0.10/514 duration 0:00:05 bytes 256

@@ -1,0 +1,60 @@
+# =============================================================================
+# ULPF Parser: Linux sshd / auth.log
+# =============================================================================
+# Matches SSH authentication events from Linux auth.log / syslog.
+# Maps to OCSF Authentication (class_uid=3002, category_uid=3).
+# =============================================================================
+
+name: linux_sshd
+version: "1.0.0"
+author: human
+created_at: "2026-09-06T00:00:00Z"
+description: >
+  Parses Linux sshd authentication log entries (auth.log / secure) and maps
+  them to OCSF Authentication events. Handles both 'Accepted' and 'Failed'
+  password/publickey authentication attempts.
+
+vendor: linux
+log_format: syslog
+match_priority: 100
+
+ocsf_class: authentication
+ocsf_category_uid: 3
+ocsf_class_uid: 3002
+
+match_patterns:
+  # Accepted password for user from 10.0.0.1 port 22 ssh2
+  - '(?P<timestamp>\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+(?P<hostname>\S+)\s+sshd\[(?P<pid>\d+)\]:\s+Accepted\s+(?P<auth_method>\S+)\s+for\s+(?P<username>\S+)\s+from\s+(?P<src_ip>\S+)\s+port\s+(?P<src_port>\d+)\s+(?P<protocol>\S+)'
+  # Failed password for user from 10.0.0.1 port 22 ssh2
+  - '(?P<timestamp>\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+(?P<hostname>\S+)\s+sshd\[(?P<pid>\d+)\]:\s+Failed\s+(?P<auth_method>\S+)\s+for\s+(?:invalid\s+user\s+)?(?P<username>\S+)\s+from\s+(?P<src_ip>\S+)\s+port\s+(?P<src_port>\d+)\s+(?P<protocol>\S+)'
+
+field_mappings:
+  - ocsf_field: user.name
+    type: str
+
+  - ocsf_field: src_endpoint.ip
+    type: str
+    jinja2_template: "{{ src_ip }}"
+
+  - ocsf_field: src_endpoint.port
+    type: int
+    jinja2_template: "{{ src_port }}"
+
+  - ocsf_field: dst_endpoint.hostname
+    type: str
+    jinja2_template: "{{ hostname }}"
+
+  - ocsf_field: auth_protocol
+    type: str
+    jinja2_template: "{{ protocol | upper }}"
+
+  - ocsf_field: service
+    type: str
+    default: "sshd"
+
+static_values:
+  severity_id: 1  # Informational
+  auth_protocol_id: 99  # Other (SSH is not in OCSF's auth_protocol_id enum)
+  is_remote: true
+  logon_type_id: 3  # Network
+  logon_type: "Network"

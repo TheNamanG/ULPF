@@ -1,0 +1,17 @@
+name: macos_unified
+version: 1.0.0
+author: human
+created_at: "2026-09-06T00:00:00Z"
+vendor: apple
+log_format: json
+match_priority: 50
+match_patterns:
+  # macOS log stream JSON format contains eventMessage and subsystem
+  - '(?P<msg>\{.*"eventMessage"\s*:.*"subsystem"\s*:.*\})'
+ocsf_class: base_event
+ocsf_category_uid: 0
+ocsf_class_uid: 0
+field_mappings:
+  - ocsf_field: message
+    type: str
+    jinja2_template: "{{ msg }}"

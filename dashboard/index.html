@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULPF Live Telemetry</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <div class="container">
+        <header>
+            <h1>Universal Log Pre-processing Framework</h1>
+            <p class="subtitle">Live Pipeline Telemetry & Performance Metrics</p>
+            <div class="status-indicator">
+                <span id="connection-status" class="status-dot"></span>
+                <span id="connection-text">Connecting...</span>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <!-- Top Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card glass">
+                    <h3>Ingestion Rate</h3>
+                    <div class="stat-value"><span id="val-eps">0</span> <span class="unit">EPS</span></div>
+                </div>
+                <div class="stat-card glass">
+                    <h3>Total Ingested</h3>
+                    <div class="stat-value"><span id="val-ingested">0</span></div>
+                </div>
+                <div class="stat-card glass">
+                    <h3>Total Parsed</h3>
+                    <div class="stat-value"><span id="val-parsed">0</span></div>
+                </div>
+                <div class="stat-card glass alert-border">
+                    <h3>Dead Lettered</h3>
+                    <div class="stat-value text-red"><span id="val-dlq">0</span></div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-container glass">
+                    <h3>Real-time Throughput (Events/sec)</h3>
+                    <canvas id="epsChart"></canvas>
+                </div>
+                <div class="chart-container glass">
+                    <h3>Internal Queue Depth</h3>
+                    <canvas id="queueChart"></canvas>
+                </div>
+                <div class="chart-container glass">
+                    <h3>Parser Distribution</h3>
+                    <canvas id="parserPieChart"></canvas>
+                </div>
+            </div>
+            <div class="history-section glass">
+                <div class="history-header">
+                    <h3>Live Event Stream & Forensic History (Last 50 Events)</h3>
+                    <div class="header-controls">
+                        <input type="text" id="searchInput" placeholder="Search events..." class="search-input">
+                        <span class="badge">Real-time Stream</span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Threat Intel</th>
+                                <th>Parser Matched</th>
+                                <th>Details</th>
+                                <th>Raw SHA-256 (Lossless Forensic Hash)</th>
+                                <th>Raw Payload Preview</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">Waiting for log stream...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JSON Details Modal -->
+    <div id="payloadModal" class="modal">
+        <div class="modal-content glass">
+            <span class="close-modal">&times;</span>
+            <h3>Raw Log Payload</h3>
+            <pre><code id="modalCodeBlock" class="language-json"></code></pre>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

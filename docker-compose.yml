@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  pipeline:
+    build: .
+    container_name: ulpf-pipeline
+    restart: unless-stopped
+    ports:
+      - "5140:5140/udp"
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./parsers/active:/app/parsers/active:ro
+    environment:
+      - ULPF_LISTEN_HOST=0.0.0.0
+      - ULPF_LISTEN_PORT=5140
+      - ULPF_DLQ_MODE=manual
+      - ULPF_SINK_MODE=jsonl
+      - ULPF_WORKER_COUNT=4
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  dashboard:
+    image: nginx:alpine
+    container_name: ulpf-dashboard
+    restart: unless-stopped
+    ports:
+      - "8888:80"
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+    depends_on:
+      - pipeline
