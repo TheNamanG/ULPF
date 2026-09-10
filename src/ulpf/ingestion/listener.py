@@ -7,6 +7,7 @@ and memory-exhaustion protections.
 from __future__ import annotations
 
 import asyncio
+import socket
 
 import structlog
 
@@ -28,6 +29,18 @@ class SyslogProtocol(asyncio.DatagramProtocol):
 
     def connection_made(self, transport: asyncio.BaseTransport) -> None:
         self.transport = transport
+        
+        # Attempt to increase the OS UDP receive buffer to handle massive bursts
+        # 32MB buffer (will be capped by OS max limits, e.g., net.core.rmem_max on Linux)
+        sock = transport.get_extra_info("socket")
+        if sock is not None:
+            try:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 32 * 1024 * 1024)
+                actual_size = sock.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
+                logger.info("udp_socket_buffer_configured", requested_mb=32, actual_bytes=actual_size)
+            except OSError as exc:
+                logger.warning("could_not_set_socket_buffer_size", error=str(exc))
+                
         logger.info("syslog_listener_started")
 
     def datagram_received(self, data: bytes, addr: tuple[str, int]) -> None:

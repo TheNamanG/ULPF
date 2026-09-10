@@ -34,7 +34,7 @@ class TestULPFSettingsDefaults:
     def test_default_queue_max_size(self) -> None:
         """Bounded backpressured queue per §3."""
         settings = ULPFSettings()
-        assert settings.queue_max_size == 10_000
+        assert settings.queue_max_size == 500_000
 
     def test_default_dedup_enabled(self) -> None:
         """Idempotency via raw_sha256 dedup per §5."""

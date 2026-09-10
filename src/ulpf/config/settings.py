@@ -37,7 +37,7 @@ class ULPFSettings(BaseSettings):
     listen_port: int = 514
     max_message_size: int = 65_536
     """Per §3: bound every network read to prevent memory-exhaustion DoS."""
-    queue_max_size: int = 10_000
+    queue_max_size: int = 500_000
     """Per §3: bounded, backpressured queue between ingestion and parser engine."""
 
     # ── DLQ Mode (Strategy Pattern selector) ─────────────────────────────
@@ -78,7 +78,7 @@ class ULPFSettings(BaseSettings):
     dedup_window_seconds: int = 300
 
     # ── Worker Pool ──────────────────────────────────────────────────────
-    worker_count: int = 4
+    worker_count: int = 16
     """Number of concurrent worker tasks for parallel event processing."""
 
     # ── Output Sinks (requirement g) ─────────────────────────────────────
