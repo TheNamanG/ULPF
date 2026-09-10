@@ -36,8 +36,8 @@ def create_dlq_handler(settings: ULPFSettings, workspace_dir: Path) -> BaseDLQHa
     elif settings.dlq_mode == "ollama":
         config = AIClientConfig(
             base_url=settings.ollama_host,
-            model="llama3",  # Sensible default for Ollama local instances
-            max_retries=2,
+            model=settings.ollama_model,  # Use the environment variable ULPF_OLLAMA_MODEL
+            max_retries=settings.ai_max_retries,
             timeout_seconds=30,
             circuit_breaker_threshold=5,
         )
@@ -51,8 +51,8 @@ def create_dlq_handler(settings: ULPFSettings, workspace_dir: Path) -> BaseDLQHa
         config = AIClientConfig(
             base_url="https://api.openai.com",
             api_key=settings.openai_api_key.get_secret_value(),
-            model="gpt-4o",  # Advanced reasoning model for zero-shot parsers
-            max_retries=2,
+            model=settings.openai_model,  # Use the environment variable ULPF_OPENAI_MODEL
+            max_retries=settings.ai_max_retries,
             timeout_seconds=30,
             circuit_breaker_threshold=5,
         )
